@@ -4,42 +4,12 @@ const rules = {
   "#": "h1",
   "##": "h2",
   "###": "h3",
+  "[[": "a"
 };
-
-const tokens = lexicalTokenizer(`
-# Title
-
-## Section One
-
-This is an example of some text that I would like to turn into HTML.
-
-This would be a new paragraph.
-
-### Sub-Section One
-
-Hello again this is another example.
-
-Very simple stuff.
-`);
-
-const result = [
-  ["h1", "Title"],
-  ["h2", "Section One"],
-  ["p", "This is an example of some text that I would like to turn into HTML."],
-  ["p", "This would be a new paragraph."],
-  ["h3", "Sub-Section One"],
-  ["p", "Hello again this is another example."],
-  ["p", "Very simple stuff."],
-];
-
-function equals(a, b) {
-  return a[0] === b[0] && a[1] === b[1];
-}
-
-const good = tokens.every((token, i) => equals(result[i], token));
 
 function lexicalTokenizer(data) {
   const tokens = data.trim().split(/ |\n/);
+  console.log(tokens)
 
   let state = "";
 
@@ -57,6 +27,14 @@ function lexicalTokenizer(data) {
       state = rules[token];
       acc.push([rules[token], ""]);
       return acc;
+    }
+
+    const linky = token.match(/\[\[(.*)\]\]/)
+
+    if (linky) {
+      const content = linky[1]
+      acc.push(["a", content]);
+      return acc
     }
 
     const current = acc[acc.length - 1];
@@ -82,7 +60,11 @@ function toHTML(lexicalTokens) {
     .reduce((acc, token) => {
       const tag = token[0];
 
-      acc.push(`<${tag}>${token[1]}</${tag}>`);
+      if (tag === 'a') {
+        acc.push(`<${tag} href='/pages/${token[1]}'>${token[1]}</${tag}>`);
+      } else {
+        acc.push(`<${tag}>${token[1]}</${tag}>`);
+      }
 
       return acc;
     }, [])
@@ -93,8 +75,6 @@ async function main() {
   const [_a, _b, path] = Bun.argv;
 
   const foo = Bun.file(path);
-
-  console.log(foo, await foo.text());
 
   const content = toHTML(lexicalTokenizer(await foo.text()));
 
