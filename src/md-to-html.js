@@ -1,3 +1,5 @@
+import template from './templates/template.html' with { type: "text" };
+
 const rules = {
   "#": "h1",
   "##": "h2",
@@ -94,7 +96,9 @@ async function main() {
 
   console.log(foo, await foo.text());
 
-  const html = toHTML(lexicalTokenizer(await foo.text()));
+  const content = toHTML(lexicalTokenizer(await foo.text()));
+
+  const html = template.replace('<!-- your content here... -->', content)
 
   await Bun.write("test.html", html);
 }
