@@ -1,4 +1,6 @@
 import template from './templates/template.html' with { type: "text" };
+import { readdir } from "node:fs/promises";
+import { parse } from 'path';
 
 const rules = {
   "#": "h1",
@@ -71,16 +73,26 @@ function toHTML(lexicalTokens) {
     .join("\n");
 }
 
+const root = "_test"
+
 async function main() {
-  const [_a, _b, path] = Bun.argv;
+  const files = await readdir(root, { recursive: true });
+  const markdownFiles = files.filter((file) => file.match(/\.md$/))
 
-  const foo = Bun.file(path);
+  console.log(markdownFiles)
 
-  const content = toHTML(lexicalTokenizer(await foo.text()));
+  await markdownFiles.forEach(async (path) => {
+    const foo = Bun.file(`${root}/${path}`);
 
-  const html = template.replace('<!-- your content here... -->', content)
+    const content = toHTML(lexicalTokenizer(await foo.text()));
 
-  await Bun.write("test.html", html);
+    const html = template.replace('<!-- your content here... -->', content)
+
+    const htmlPath = `${path.replace('.md', '.html')}`
+
+    await Bun.write(htmlPath, html);
+  })
+
 }
 
 main();

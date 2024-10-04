@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "table-of-contents.md",
+                "file": "pages/understanding.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "table-of-contents.md",
+                "file": "pages/understanding.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "table-of-contents.md",
+                "file": "pages/understanding.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "table-of-contents.md"
+                "file": "pages/understanding.md"
               }
             }
           }
@@ -146,11 +146,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "5bb89686e13debb5",
+  "active": "4d35f7132c437187",
   "lastOpenFiles": [
+    "table-of-contents.md",
+    "index.md",
     "pages/understanding.md",
     "pages/mashing.md",
-    "table-of-contents.md",
     "pages",
     "stuff/whatever.md"
   ]
