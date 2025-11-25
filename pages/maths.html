@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Printable Math Worksheet — Addition & Subtraction (≤ 3 digits)</title>
+  <style>
+    :root{
+      --cols: 3;       /* digits */
+      --font: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      --size: 28px;
+      --gap: 20px;
+    }
+    html{height:100%;}
+    body{
+      margin:20px;
+      font-family:var(--font);
+      color:#111;
+    }
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    h1{font-size:20px;margin:0}
+    .controls{display:flex;gap:8px;align-items:center}
+    button,input{font-size:14px;padding:6px 8px}
+    .sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--gap)}
+
+    .problem{
+      border:1px dashed transparent; /* prints clean */
+      padding:12px 10px 8px 10px;
+      min-height:90px;
+      display:flex;flex-direction:column;justify-content:flex-end;
+      page-break-inside:avoid;
+    }
+
+    /* The visual math area uses pre (fixed-width) for alignment */
+    pre.math{
+      margin:0; font-size:var(--size); line-height:1; white-space:pre; text-align:right;
+    }
+
+    .math .result-line{border-top:2px solid #000;margin-top:8px;padding-top:6px}
+
+    /* small caption when answers hidden */
+    .meta{font-size:12px;color:#555;margin-top:8px}
+
+    /* print-friendly: remove controls when printing */
+    @media print{
+      header, .controls { display:none !important }
+      body{margin:6mm}
+      .sheet{grid-template-columns:repeat(2,1fr);gap:18px}
+    }
+
+    /* answers hidden by default; when .show-answers is on sheet, reveal results */
+    .show-answers pre.math .answer{visibility:visible}
+    pre.math .answer{visibility:hidden}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Printable Math Worksheet — 1–3 digit addition & subtraction</h1>
+    <div class="controls">
+      <label><input id="chgCount" type="number" value="10" min="4" max="40" style="width:68px"> problems</label>
+      <button id="regen">Regenerate</button>
+      <label><input id="showAnswers" type="checkbox"> Show answers</label>
+      <button id="print">Print</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="sheet" class="sheet"></section>
+  </main>
+
+  <script>
+    // Utility: pad number as right-aligned in width
+    function padRight(num, width){
+      const s = String(num);
+      return ' '.repeat(Math.max(0, width - s.length)) + s;
+    }
+
+    // Generate a random integer between lo and hi inclusive
+    function randInt(lo, hi){ return Math.floor(Math.random()*(hi-lo+1)) + lo }
+
+    // Decide whether a number (with digits arrays) will require carry/borrow
+    function digitsOf(n, width){
+      const s = String(n).padStart(width,'0');
+      return s.split('').map(d=>parseInt(d));
+    }
+
+    // Generate an addition problem with up to maxDigits, optionally requiring carry or not
+    function genAddition(maxDigits, requireCarry){
+      const w = randInt(1, maxDigits);
+      // We'll build digit arrays from least significant to most (right to left)
+      let a = new Array(w).fill(0), b = new Array(w).fill(0);
+
+      if(requireCarry === null){
+        // random whether carry needed half the time
+        requireCarry = Math.random() < 0.5;
+      }
+
+      if(requireCarry){
+        // ensure at least one column sum >=10
+        const carryPos = randInt(0,w-1);
+        for(let i=0;i<w;i++){
+          if(i===carryPos){
+            a[i] = randInt(1,9); // avoid zero to make a visible digit
+            b[i] = randInt(10 - a[i], 9); // so sum >=10
+          } else {
+            // choose digits that might or might not carry randomly
+            a[i] = randInt(0,9);
+            b[i] = randInt(0,9);
+          }
+        }
+      } else {
+        // ensure all column sums < 10
+        for(let i=0;i<w;i++){
+          a[i] = randInt(0,9);
+          b[i] = randInt(0,9 - a[i]);
+        }
+        // avoid leading zeros for top number
+        if(a[w-1]===0) a[w-1]=randInt(1,9);
+      }
+      // convert arrays back to numbers
+      const A = parseInt(a.slice().reverse().join(''));
+      const B = parseInt(b.slice().reverse().join(''));
+      return {op: '+', a: A, b: B, width: w, result: A+B, carry: requireCarry};
+    }
+
+    // Generate subtraction problem ensuring non-negative, optionally requiring borrow
+    function genSubtraction(maxDigits, requireBorrow){
+      const w = randInt(1, maxDigits);
+      let a = new Array(w).fill(0), b = new Array(w).fill(0);
+      if(requireBorrow === null){ requireBorrow = Math.random() < 0.5 }
+
+      if(requireBorrow){
+        // ensure at least one position where a digit < b digit
+        const borrowPos = randInt(0,w-1);
+        for(let i=0;i<w;i++){
+          if(i===borrowPos){
+            b[i] = randInt(1,9);
+            a[i] = randInt(0,b[i]-1);
+          } else {
+            // digits chosen so might or might not need borrow
+            a[i] = randInt(0,9);
+            b[i] = randInt(0,a[i]>=0?Math.min(9,a[i]+3):9);
+            // above allows some b > a sometimes elsewhere
+          }
+        }
+      } else {
+        // ensure in every column a >= b so no borrow
+        for(let i=0;i<w;i++){
+          a[i] = randInt(0,9);
+          b[i] = randInt(0,a[i]);
+        }
+      }
+
+      // ensure top number is >= bottom overall by possibly adjusting higher digits
+      // Build numbers from msd to lsd by reversing
+      let A = parseInt(a.slice().reverse().join(''));
+      let B = parseInt(b.slice().reverse().join(''));
+      if(A < B){
+        // If it's smaller, increment high digits until A>=B
+        const diff = B - A;
+        A += diff;
+        // clamp to max digits value
+        const maxA = Math.pow(10,w)-1;
+        if(A > maxA){
+          // fallback: swap to make non-negative
+          const tmp = A; A = B; B = tmp;
+        }
+      }
+
+      // ensure top doesn't have leading zero
+      if(String(A).length < w){
+        A = parseInt(String(A).padStart(w,'0'));
+      }
+
+      // Recalculate borrow existence accurately
+      const aDigits = digitsOf(A,w).reverse();
+      const bDigits = digitsOf(B,w).reverse();
+      const actualBorrow = aDigits.some((d,i)=> d < bDigits[i]);
+
+      return {op: '-', a: A, b: B, width: w, result: A-B, borrow: actualBorrow};
+    }
+
+    function generateProblems(count){
+      const problems = [];
+      for(let i=0;i<count;i++){
+        // randomly choose op with equal probability
+        const isAdd = Math.random() < 0.5;
+        // randomly decide require carry/borrow sometimes
+        const forceFlag = Math.random();
+        let p;
+        if(isAdd){
+          // 40% force carry, 40% force no-carry, 20% random
+          const flag = forceFlag < 0.4 ? true : (forceFlag < 0.8 ? false : null);
+          p = genAddition(3, flag);
+        } else {
+          // subtraction: 40% force borrow, 40% force no-borrow, 20% random
+          const flag = forceFlag < 0.4 ? true : (forceFlag < 0.8 ? false : null);
+          p = genSubtraction(3, flag);
+        }
+        problems.push(p);
+      }
+      return problems;
+    }
+
+    function renderProblems(container, problems, showAnswers){
+      container.innerHTML = '';
+      const maxWidth = 3; // fixed 3-digit columns for layout
+      problems.forEach((p, idx)=>{
+        const lines = [];
+        const w = Math.max(p.width,1);
+        const top = padRight(p.a, maxWidth);
+        const bottom = (p.op + ' ' + padRight(p.b, maxWidth-1)).padStart(maxWidth+2);
+        // We'll format so that operator sits to left of second operand like: "+/- 123"
+        // Build result string but keep it as answer span that can be hidden
+        const resultStr = padRight(p.result, maxWidth);
+
+        const pre = document.createElement('pre');
+        pre.className = 'math';
+        // Build visible lines
+        // Line 1: top number right-aligned within maxWidth
+        const line1 = top;
+        // Line 2: operator + space + bottom number right aligned
+        const line2 = p.op + ' ' + padRight(p.b, maxWidth);
+        // Divider line and answer area
+        const divider = ' '.repeat(0) + '-'.repeat(maxWidth + 1);
+
+        // Compose into pre; answers inside span.answer
+        pre.textContent = line1 + '\n' + line2 + '\n' + ''.padEnd(0) + '\n';
+        // We will append divider and answer as nodes so we can hide answer via CSS
+        const divLine = document.createElement('div');
+        divLine.className = 'result-line';
+        divLine.style.fontFamily = 'inherit';
+        divLine.style.fontSize = '0.9em';
+        divLine.style.marginTop = '6px';
+        divLine.style.display = 'flex';
+        divLine.style.justifyContent = 'flex-end';
+        divLine.style.gap = '10px';
+
+        const bar = document.createElement('span');
+        bar.textContent = ''.padStart(maxWidth+1, '─');
+        bar.style.letterSpacing = '1px';
+
+        const ans = document.createElement('span');
+        ans.className = 'answer';
+        ans.textContent = resultStr;
+        ans.style.marginLeft = '8px';
+
+        divLine.appendChild(bar);
+        divLine.appendChild(ans);
+
+        const problemDiv = document.createElement('div');
+        problemDiv.className = 'problem';
+
+        // Use a small wrapper to place the pre and divider properly and keep monospace alignment
+        const wrapper = document.createElement('div');
+        wrapper.appendChild(pre);
+        wrapper.appendChild(divLine);
+
+        problemDiv.appendChild(wrapper);
+
+        // add meta line: show whether carry/borrow is present (useful for teachers) but keep faint
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = `(${p.op === '+' ? (p.carry? 'carry':'no carry') : (p.borrow ? 'borrow' : 'no borrow')})`;
+        problemDiv.appendChild(meta);
+
+        container.appendChild(problemDiv);
+      });
+
+      // toggle answers visibility by controlling class on sheet
+      if(showAnswers){
+        container.classList.add('show-answers');
+      } else {
+        container.classList.remove('show-answers');
+      }
+    }
+
+    // Wire up UI
+    const sheet = document.getElementById('sheet');
+    const regen = document.getElementById('regen');
+    const showAnswersCheckbox = document.getElementById('showAnswers');
+    const printBtn = document.getElementById('print');
+    const chgCount = document.getElementById('chgCount');
+
+    function refresh(){
+      const count = Math.max(4, Math.min(40, parseInt(chgCount.value) || 12));
+      const problems = generateProblems(count);
+      renderProblems(sheet, problems, showAnswersCheckbox.checked);
+    }
+
+    regen.addEventListener('click', refresh);
+    showAnswersCheckbox.addEventListener('change', () => {
+      if(showAnswersCheckbox.checked) sheet.classList.add('show-answers'); else sheet.classList.remove('show-answers');
+    });
+    printBtn.addEventListener('click', ()=>window.print());
+
+    // initial render
+    refresh();
+  </script>
+</body>
+</html>
