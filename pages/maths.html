@@ -9,7 +9,7 @@
       --cols: 3;       /* digits */
       --font: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
       --size: 28px;
-      --gap: 30px;
+      --gap: 40px;
     }
     html{height:100%;}
     body{
@@ -45,7 +45,7 @@
     @media print{
       header, .controls { display:none !important }
       body{margin:6mm}
-      .sheet{grid-template-columns:repeat(3,1fr);gap:18px}
+      .sheet{grid-template-columns:repeat(3,1fr);gap:30}
     }
 
     /* answers hidden by default; when .show-answers is on sheet, reveal results */
@@ -57,7 +57,7 @@
   <header>
     <h1>Printable Math Worksheet — 1–3 digit addition & subtraction</h1>
     <div class="controls">
-      <label><input id="chgCount" type="number" value="24" min="4" max="40" style="width:68px"> problems</label>
+      <label><input id="chgCount" type="number" value="18" min="4" max="40" style="width:68px"> problems</label>
       <button id="regen">Regenerate</button>
       <label><input id="showAnswers" type="checkbox"> Show answers</label>
       <button id="print">Print</button>
