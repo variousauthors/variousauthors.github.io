@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Marin Vale — Graphic Designer</title>
+  <meta name="description" content="Portfolio of Marin Vale — simple, image-first graphic design." />
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa6b2; --accent:#ffd166; --glass: rgba(255,255,255,0.04);
+      --max-width:1100px; --radius:14px; --gap:22px; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background: linear-gradient(180deg,#061026 0%, #071428 40%, #071425 100%); color:#e6eef6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      line-height:1.45; padding:36px 20px; display:flex; justify-content:center; align-items:flex-start;
+    }
+    .wrap{width:100%; max-width:var(--max-width)}
+
+    header{display:flex; gap:18px; align-items:center; margin-bottom:28px}
+    .logo{display:flex; gap:12px; align-items:center}
+    .badge{width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,#5eead4,#60a5fa); display:grid; place-items:center; color:#05202a; font-weight:700; font-size:20px}
+    h1{font-size:28px;margin:0}
+    h2{font-size:14px;margin:4px 0 0;color:var(--muted)}
+
+    .hero{
+      display:grid; grid-template-columns: 1fr 420px; gap:24px; align-items:center; margin-bottom:28px;
+    }
+    @media (max-width:900px){ .hero{grid-template-columns:1fr; } }
+
+    .intro-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:22px; border-radius:var(--radius); box-shadow: 0 6px 20px rgba(2,6,23,0.6);}
+    .intro-card p{color:var(--muted); margin:12px 0 18px}
+    .cta-row{display:flex; gap:12px}
+    .btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn-primary{background:var(--accent); color:#042426}
+    .btn-ghost{background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.04)}
+
+    /* image showcase */
+    .showcase{border-radius:var(--radius); overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow: 0 8px 30px rgba(2,6,23,0.6);}
+    .showcase .hero-img{width:100%; height:100%; min-height:260px; display:grid; place-items:center}
+
+    /* gallery */
+    .gallery{display:grid; grid-template-columns: repeat(3,1fr); gap:var(--gap); margin:26px 0}
+    @media (max-width:900px){ .gallery{grid-template-columns:repeat(1,1fr)} }
+    .card{background:var(--card); padding:14px; border-radius:12px}
+    .card figure{margin:0}
+    .caption{font-size:13px; color:var(--muted); margin-top:8px}
+
+    footer{color:var(--muted); font-size:13px; margin-top:18px; display:flex; justify-content:space-between; align-items:center}
+
+    /* small utility */
+    .meta{font-size:12px; color:var(--muted)}
+    .project-title{font-weight:700; margin:0 0 6px}
+    .project-desc{color:var(--muted); margin:0}
+
+    /* subtle hover */
+    .card:hover{transform:translateY(-6px); transition:transform .28s ease}
+    .btn:active{transform:translateY(1px)}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">
+        <div class="badge">MV</div>
+        <div>
+          <h1>Marin Vale</h1>
+          <h2>Independent Graphic Designer — Branding · Editorial · Posters</h2>
+        </div>
+      </div>
+      <div style="margin-left:auto" class="meta">Based in Vancouver • Available for freelance</div>
+    </header>
+
+    <section class="hero">
+      <div class="intro-card">
+        <p style="font-size:18px; margin:0 0 6px">Image-first design that breathes — clean layouts, bold colour, and clear storytelling. Marin crafts visual systems and posters with an emphasis on legibility and emotional rhythm.</p>
+        <p>Selected work: festival posters, brand identities, editorial spreads. Clients: made-up cafés, local theatres, indie bands.</p>
+        <div class="cta-row">
+          <button class="btn btn-primary">Hire for a project</button>
+          <button class="btn btn-ghost">Download portfolio PDF</button>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:12px; align-items:center">
+          <div style="width:52px; height:52px; border-radius:10px; background:var(--glass); display:grid; place-items:center">🖋️</div>
+          <div>
+            <div style="font-weight:700">Marin Vale</div>
+            <div class="meta">Senior Designer — 8 years experience • BA Visual Communication</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="showcase">
+        <div class="hero-img">
+          <!-- Inline SVG hero artwork (sample image) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#ffd166"/>
+                <stop offset="1" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+            <rect width="800" height="500" rx="12" fill="#021427" />
+            <g transform="translate(40,40)">
+              <rect x="0" y="0" width="360" height="200" rx="10" fill="url(#g1)" opacity="0.95" />
+              <circle cx="540" cy="120" r="90" fill="#86efac" opacity="0.95" />
+              <text x="24" y="150" fill="#001219" font-size="28" font-weight="700" font-family="sans-serif">"Posters that speak"</text>
+              <text x="24" y="188" fill="#cbd5e1" font-size="12">Brand identity and editorial systems</text>
+            </g>
+          </svg>
+        </div>
+      </aside>
+    </section>
+
+    <section>
+      <h3 style="margin:6px 0 12px">Selected projects</h3>
+      <div class="gallery">
+        <article class="card">
+          <figure>
+            <!-- sample image 1: compact poster -->
+            <svg viewBox="0 0 600 400" width="100%" height="160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="100%" height="100%" rx="10" fill="#071427" />
+              <rect x="18" y="20" width="220" height="120" rx="8" fill="#ffd166" />
+              <rect x="250" y="40" width="300" height="70" rx="6" fill="#60a5fa" />
+              <text x="30" y="170" fill="#cbd5e1" font-size="18" font-weight="700">Oak & Echo — Festival Poster</text>
+            </svg>
+          </figure>
+          <div class="caption">
+            <div class="project-title">Oak & Echo — Poster</div>
+            <p class="project-desc">Bold typography, layered shapes, built to print at 24" × 36". Colour system created for evening venues.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <figure>
+            <!-- sample image 2: editorial spread -->
+            <svg viewBox="0 0 600 400" width="100%" height="160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="100%" height="100%" rx="10" fill="#072031" />
+              <rect x="24" y="22" width="520" height="120" rx="6" fill="#86efac" />
+              <rect x="24" y="150" width="190" height="28" rx="4" fill="#ffd166" />
+              <text x="30" y="200" fill="#cbd5e1" font-size="16" font-weight="700">Morning Pages — Editorial Layout</text>
+            </svg>
+          </figure>
+          <div class="caption">
+            <div class="project-title">Morning Pages — Editorial</div>
+            <p class="project-desc">A flexible grid and typographic scale for long-form reading—used in a small-run quarterly.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <figure>
+            <!-- sample image 3: brand mark -->
+            <svg viewBox="0 0 600 400" width="100%" height="160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="100%" height="100%" rx="10" fill="#031021" />
+              <g transform="translate(60,40)">
+                <circle cx="120" cy="60" r="48" fill="#60a5fa" />
+                <rect x="200" y="24" width="230" height="90" rx="10" fill="#ffd166" />
+                <text x="24" y="170" fill="#cbd5e1" font-size="18" font-weight="700">Habitat — Brand System</text>
+              </g>
+            </svg>
+          </figure>
+          <div class="caption">
+            <div class="project-title">Habitat — Brand</div>
+            <p class="project-desc">A concise visual language for a community café: mark, palette, and usage guidelines.</p>
+          </div>
+        </article>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 280px; gap:18px; align-items:start">
+        <div class="card">
+          <h4 style="margin-top:0">Process</h4>
+          <p class="project-desc">Research → Sketch → Systemize → Refine. Projects begin with large-format sketches and visual experiments, then scale into modular systems suitable for print and web. Emphasis on colour harmony and accessible type scales.</p>
+        </div>
+
+        <aside class="card">
+          <h4 style="margin-top:0">Contact</h4>
+          <p class="project-desc">Email: <strong>marin@valestudio.example</strong><br/>Availability: 4–6 week lead time for brand projects.</p>
+          <div style="margin-top:10px; display:flex; gap:8px">
+            <button class="btn btn-primary">Say hello</button>
+            <button class="btn btn-ghost">View CV</button>
+          </div>
+        </aside>
+      </div>
+
+    </section>
+
+    <footer>
+      <div>© 2025 Marin Vale — All illustrative content is sample artwork for this demo.</div>
+      <div style="opacity:.9">Designed with care • Vancouver</div>
+    </footer>
+
+  </div>
+</body>
+</html>

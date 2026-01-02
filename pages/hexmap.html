@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Printable Hex Map</title>
+
+<style>
+@page {
+  margin: 0.4in;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+label {
+  display: flex;
+  gap: 0.4rem;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media print {
+  .controls { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <label>Width <input id="width" type="number" value="12"></label>
+  <label>Height <input id="height" type="number" value="12"></label>
+  <button onclick="generate()">Generate</button>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<div id="map"></div>
+
+<script>
+const INCH = 96;
+const FLAT = INCH;
+const R = FLAT / 2;
+const HEX_H = Math.sqrt(3) * R;
+const COL_STEP = 0.75 * FLAT;
+const ROW_STEP = HEX_H;
+const STROKE = 1.5;
+const PAD = R + STROKE * 2;
+
+function hexPoints(cx, cy, r) {
+  let pts = [];
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 180 * (60 * i);
+    pts.push([
+      cx + r * Math.cos(a),
+      cy + r * Math.sin(a)
+    ]);
+  }
+  return pts.map(p => p.join(",")).join(" ");
+}
+
+function generate() {
+  const w = +width.value;
+  const h = +height.value;
+
+  const contentW = COL_STEP * (w - 1) + FLAT;
+  const contentH = ROW_STEP * (h + 0.5);
+
+  const svgW = contentW + PAD * 2;
+  const svgH = contentH + PAD * 2;
+
+  let svg = `
+  <svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 ${svgW} ${svgH}">
+    <g fill="none" stroke="black" stroke-width="${STROKE}">
+  `;
+
+  for (let c = 0; c < w; c++) {
+    for (let r = 0; r < h; r++) {
+      const x = PAD + c * COL_STEP + R;
+      const y = PAD + r * ROW_STEP + (c % 2 ? ROW_STEP / 2 : 0) + HEX_H / 2;
+      svg += `<polygon points="${hexPoints(x, y, R)}"/>`;
+    }
+  }
+
+  svg += `</g></svg>`;
+  map.innerHTML = svg;
+}
+
+generate();
+</script>
+
+</body>
+</html>
