@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Random Comic Page Generator</title>
+<title>Comic Page Generator</title>
 
 <style>
 @page {
@@ -11,8 +11,8 @@
 }
 
 body {
-  font-family: system-ui, sans-serif;
   margin: 0;
+  font-family: system-ui, sans-serif;
 }
 
 .controls {
@@ -23,6 +23,7 @@ body {
 
 button {
   padding: 0.4rem 0.8rem;
+  cursor: pointer;
 }
 
 svg {
@@ -39,7 +40,7 @@ svg {
 <body>
 
 <div class="controls">
-  <button onclick="generate()">Regenerate Layout</button>
+  <button onclick="generate()">Regenerate</button>
   <button onclick="window.print()">Print</button>
 </div>
 
@@ -49,29 +50,62 @@ svg {
 const INCH = 96;
 const PAGE_W = 8.5 * INCH;
 const PAGE_H = 11 * INCH;
+
 const MARGIN = 0.5 * INCH;
 const GUTTER = 12;
 const STROKE = 4;
 
-const MIN_ROW_HEIGHT = 1.4 * INCH;
-const MAX_ROW_HEIGHT = 2.4 * INCH;
+const ROWS = 3;
+
+// Panel sanity limits
+const MIN_PANEL_WIDTH = 0.8 * INCH;
+
+// ------------------------
 
 function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function generateRowSplits(n) {
-  // random weights normalized to sum = 1
-  const w = Array.from({ length: n }, () => rand(0.6, 1.4));
-  const sum = w.reduce((a, b) => a + b, 0);
-  return w.map(x => x / sum);
+function weightedSplits(n, variance = 0.4) {
+  const weights = Array.from({ length: n }, () => rand(1 - variance, 1 + variance));
+  const sum = weights.reduce((a, b) => a + b, 0);
+  return weights.map(w => w / sum);
+}
+
+// Prevent ugly super-thin panels
+function fixThinPanels(splits, totalWidth, panelCount) {
+  const usable = totalWidth - (panelCount - 1) * GUTTER;
+
+  for (let i = 0; i < splits.length; i++) {
+    const w = splits[i] * usable;
+    if (w < MIN_PANEL_WIDTH) {
+      splits[i] = MIN_PANEL_WIDTH / usable;
+    }
+  }
+
+  // renormalize
+  const sum = splits.reduce((a, b) => a + b, 0);
+  return splits.map(s => s / sum);
+}
+
+// Occasionally produce cinematic rows
+function pickPanelCount() {
+  const r = Math.random();
+  if (r < 0.2) return 1; // full-width panel
+  if (r < 0.6) return 2;
+  return 3;
 }
 
 function generate() {
-  const contentW = PAGE_W - MARGIN * 2;
-  const contentH = PAGE_H - MARGIN * 2;
+  const contentW = PAGE_W - 2 * MARGIN;
+  const contentH = PAGE_H - 2 * MARGIN;
 
-  let y = MARGIN;
+  const totalGutterH = (ROWS - 1) * GUTTER;
+  const usableH = contentH - totalGutterH;
+
+  // Row height distribution
+  const rowSplits = weightedSplits(ROWS, 0.35);
+
   let svg = `
   <svg xmlns="http://www.w3.org/2000/svg"
        viewBox="0 0 ${PAGE_W} ${PAGE_H}">
@@ -79,18 +113,20 @@ function generate() {
     <g fill="white" stroke="black" stroke-width="${STROKE}">
   `;
 
-  while (y < PAGE_H - MARGIN - MIN_ROW_HEIGHT) {
-    const panels = Math.floor(rand(1, 4)); // 1–4 panels
-    const rowH = rand(MIN_ROW_HEIGHT, MAX_ROW_HEIGHT);
+  let y = MARGIN;
 
-    if (y + rowH > PAGE_H - MARGIN) break;
+  for (let r = 0; r < ROWS; r++) {
+    const rowH = rowSplits[r] * usableH;
 
-    const splits = generateRowSplits(panels);
+    const panelCount = pickPanelCount();
+
+    let splits = weightedSplits(panelCount, 0.5);
+    splits = fixThinPanels(splits, contentW, panelCount);
+
     let x = MARGIN;
 
-    for (let i = 0; i < panels; i++) {
-      const w =
-        splits[i] * (contentW - (panels - 1) * GUTTER);
+    for (let i = 0; i < panelCount; i++) {
+      const w = splits[i] * (contentW - (panelCount - 1) * GUTTER);
 
       svg += `<rect x="${x}" y="${y}" width="${w}" height="${rowH}" />`;
       x += w + GUTTER;
@@ -100,7 +136,7 @@ function generate() {
   }
 
   svg += `</g></svg>`;
-  page.innerHTML = svg;
+  document.getElementById("page").innerHTML = svg;
 }
 
 generate();
