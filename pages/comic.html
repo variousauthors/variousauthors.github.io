@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Random Comic Page Generator</title>
+
+<style>
+@page {
+  size: letter;
+  margin: 0.5in;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+button {
+  padding: 0.4rem 0.8rem;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media print {
+  .controls { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="generate()">Regenerate Layout</button>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<div id="page"></div>
+
+<script>
+const INCH = 96;
+const PAGE_W = 8.5 * INCH;
+const PAGE_H = 11 * INCH;
+const MARGIN = 0.5 * INCH;
+const GUTTER = 12;
+const STROKE = 4;
+
+const MIN_ROW_HEIGHT = 1.4 * INCH;
+const MAX_ROW_HEIGHT = 2.4 * INCH;
+
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function generateRowSplits(n) {
+  // random weights normalized to sum = 1
+  const w = Array.from({ length: n }, () => rand(0.6, 1.4));
+  const sum = w.reduce((a, b) => a + b, 0);
+  return w.map(x => x / sum);
+}
+
+function generate() {
+  const contentW = PAGE_W - MARGIN * 2;
+  const contentH = PAGE_H - MARGIN * 2;
+
+  let y = MARGIN;
+  let svg = `
+  <svg xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 ${PAGE_W} ${PAGE_H}">
+    <rect width="${PAGE_W}" height="${PAGE_H}" fill="white"/>
+    <g fill="white" stroke="black" stroke-width="${STROKE}">
+  `;
+
+  while (y < PAGE_H - MARGIN - MIN_ROW_HEIGHT) {
+    const panels = Math.floor(rand(1, 4)); // 1–4 panels
+    const rowH = rand(MIN_ROW_HEIGHT, MAX_ROW_HEIGHT);
+
+    if (y + rowH > PAGE_H - MARGIN) break;
+
+    const splits = generateRowSplits(panels);
+    let x = MARGIN;
+
+    for (let i = 0; i < panels; i++) {
+      const w =
+        splits[i] * (contentW - (panels - 1) * GUTTER);
+
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${rowH}" />`;
+      x += w + GUTTER;
+    }
+
+    y += rowH + GUTTER;
+  }
+
+  svg += `</g></svg>`;
+  page.innerHTML = svg;
+}
+
+generate();
+</script>
+
+</body>
+</html>
